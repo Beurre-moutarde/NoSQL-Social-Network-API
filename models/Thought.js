@@ -1,4 +1,35 @@
-const { Schema, model } = require("mongoose");
+const { Schema, model, Types } = require("mongoose");
+const moment = require('moment');
+
+// Chema to create a reaction
+const reactionSchema = new Schema({
+  reactionId: {
+      type: Schema.Types.ObjectId,
+      default: () => new Types.ObjectId()
+  },
+  reactionBody: {
+      type: String,
+      required: true,
+      maxlength: 280
+  },
+  username: {
+      type: String,
+      required: true
+  },
+  createdAt: {
+      type: Date,
+      default: Date.now,
+      get: createdAtVal => moment(createdAtVal).format('MMM DD, YYYY [at] hh:mm a')
+  }
+},
+  {
+      toJSON: {
+          virtuals: true,
+          getters: true
+      },
+      id: false
+  }
+);
 
 // Schema to create Thought model
 const thoughtSchema = new Schema(
@@ -12,6 +43,7 @@ const thoughtSchema = new Schema(
     createdAT: {
       type: Date,
       default: Date.now,
+      get: createdAtVal => moment(createdAtVal).format('MMM DD, YYYY [at] hh:mm a')
     },
     username: {
       type: String,
@@ -19,7 +51,7 @@ const thoughtSchema = new Schema(
     },
     reactions: [
       {
-        type: mongoose.reactionSchema.Types.ObjectId,
+        type: mongoose.schema.Types.ObjectId,
         ref: "Reaction",
       },
     ],
@@ -30,11 +62,6 @@ const thoughtSchema = new Schema(
     },
   }
 );
-
-// Create a virtual called formattedDate to use a getter function to format the createdAt timestamp into a string.
-thoughtSchema.virtual("formattedDate").get(function () {
-  return this.createdAt.toDateString();
-});
 
 thoughtSchema.virtual('reactionCount').get(function() {
     return this.reactions.length;
