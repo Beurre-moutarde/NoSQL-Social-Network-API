@@ -10,7 +10,14 @@ modules.exports = {
   //GET a single user by its _id and populated thought and friend data
   getSingleUser(req, res) {
     User.findOne({ _id: req.params.userId })
-      .select("-__v")
+      .populate({
+        path: "thoughts",
+        select: "-__v",
+      })
+      .populate({
+        path: "friends",
+        select: "-__v",
+      })
       .then((user) =>
         !user
           ? res.status(404).json({ message: "No user with that ID" })
@@ -55,7 +62,43 @@ modules.exports = {
           ? res.status(404).json({ message: "No user with that ID" })
           : Thought.deleteMany({ _id: { $in: user.thought } })
       )
-      .then(() => res.json({ message: "User and associated thoughtss deleted!" }))
+      .then(() =>
+        res.json({ message: "User and associated thoughtss deleted!" })
+      )
       .catch((err) => res.status(500).json(err));
+  },
+
+  //Add a friend to a user by updating user
+  addFriend({ params }, res) {
+    User.findOneAndUpdate(
+      { _id: params.userId },
+      { $push: { friends: params.friendId } },
+      { new: true }
+    )
+      .then((dbUserData) => {
+        if (!dbUserData) {
+          res.status(404).json({ message: "No user found with this id" });
+          return;
+        }
+        res.json(dbUserData);
+      })
+      .catch((err) => res.status(400).json(err));
+  },
+
+  //Delete a friend by updating user
+  deleteFriend({ params }, res) {
+    User.findOneAndUpdate(
+      { _id: params.userId },
+      { $pull: { friends: params.friendId } },
+      { new: true }
+    )
+      .then((dbUserData) => {
+        if (!dbUserData) {
+          res.status(404).json({ message: "No user found with this id" });
+          return;
+        }
+        res.json(dbUserData);
+      })
+      .catch((err) => res.status(400).json(err));
   },
 };
