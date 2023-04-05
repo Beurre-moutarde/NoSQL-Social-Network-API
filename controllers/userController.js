@@ -18,17 +18,17 @@ modules.exports = {
         path: "friends",
         select: "-__v",
       })
-      .then((user) =>
+      .then((users) =>
         !user
           ? res.status(404).json({ message: "No user with that ID" })
-          : res.json(user)
+          : res.json(users)
       )
       .catch((err) => res.status(500).json(err));
   },
   //POST a new user
   createUser(req, res) {
     User.create(req.body)
-      .then((user) => res.json(user))
+      .then((users) => res.json(users))
       .catch((err) => res.status(500).json(err));
   },
   //PUT to update a user by its _id
@@ -40,29 +40,29 @@ modules.exports = {
       { _id: userId },
       { $set: { username, email } },
       { new: true },
-      (err, user) => {
+      (err, users) => {
         if (err) {
           console.error(err);
           return res.status(500).json({ error: "Internal server error" });
         }
 
-        if (!user) {
+        if (!users) {
           return res.status(404).json({ error: "User not found" });
         }
 
-        return res.status(200).json(user);
+        return res.status(200).json(users);
       }
     );
   },
   //DELETE to remove user by its _id
   deleteUser(req, res) {
     User.findOneAndDelete({ _id: req.params.userId })
-      .then((user) =>
+      .then((users) =>
         !user
           ? res.status(404).json({ message: "No user with that ID" })
-          : Thought.deleteMany({ _id: { $in: user.thought } })
+          : Thought.deleteMany({ _id: { $in: users.thought } })
       )
-      .then(() =>
+      .then((users) =>
         res.json({ message: "User and associated thoughtss deleted!" })
       )
       .catch((err) => res.status(500).json(err));
@@ -75,12 +75,12 @@ modules.exports = {
       { $push: { friends: params.friendId } },
       { new: true }
     )
-      .then((dbUserData) => {
-        if (!dbUserData) {
+      .then((users) => {
+        if (!users) {
           res.status(404).json({ message: "No user found with this id" });
           return;
         }
-        res.json(dbUserData);
+        res.json(users);
       })
       .catch((err) => res.status(400).json(err));
   },
@@ -92,12 +92,12 @@ modules.exports = {
       { $pull: { friends: params.friendId } },
       { new: true }
     )
-      .then((dbUserData) => {
-        if (!dbUserData) {
+      .then((users) => {
+        if (!users) {
           res.status(404).json({ message: "No user found with this id" });
           return;
         }
-        res.json(dbUserData);
+        res.json(users);
       })
       .catch((err) => res.status(400).json(err));
   },
