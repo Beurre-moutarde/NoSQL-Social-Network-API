@@ -1,6 +1,6 @@
 const { User, Thought } = require("../models");
 
-modules.exports = {
+const thoughtController = {
   //GET all thoughts
   getThoughts(req, res) {
     Thought.find({})
@@ -114,3 +114,5 @@ modules.exports = {
       .catch((err) => res.json(err));
   },
 };
+
+module.exports = thoughtController

@@ -1,6 +1,6 @@
 const { User, Thought } = require("../models");
 
-modules.exports = {
+const userController = {
   //GET all users
   getUsers(req, res) {
     User.find()
@@ -58,7 +58,7 @@ modules.exports = {
   deleteUser(req, res) {
     User.findOneAndDelete({ _id: req.params.userId })
       .then((users) =>
-        !user
+        !users
           ? res.status(404).json({ message: "No user with that ID" })
           : Thought.deleteMany({ _id: { $in: users.thought } })
       )
@@ -102,3 +102,5 @@ modules.exports = {
       .catch((err) => res.status(400).json(err));
   },
 };
+
+module.exports = userController

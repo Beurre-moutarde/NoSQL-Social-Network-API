@@ -17,13 +17,13 @@ const userSchema = new Schema(
     },
     thoughts: [
       {
-        type: mongoose.thoughtSchema.Types.ObjectId,
+        type: Schema.Types.ObjectId,
         ref: "Thought",
       },
     ],
     friends: [
       {
-        type: mongoose.userSchema.Types.ObjectId,
+        type: Schema.Types.ObjectId,
         ref: "User",
       },
     ],
